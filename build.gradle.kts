@@ -4,6 +4,7 @@ plugins {
 	id("org.springframework.boot") version "3.3.5"
 	id("io.gitlab.arturbosch.detekt") version "1.23.8"
 	id("io.spring.dependency-management") version "1.1.7"
+	jacoco
 }
 
 group = "br.com.agilworks"
@@ -38,6 +39,29 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+tasks.jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = "0.80".toBigDecimal()
+			}
+		}
+	}
 }
 
 detekt {
