@@ -4,6 +4,7 @@ plugins {
 	id("org.springframework.boot") version "3.3.5"
 	id("io.gitlab.arturbosch.detekt") version "1.23.8"
 	id("io.spring.dependency-management") version "1.1.7"
+	jacoco
 }
 
 group = "br.com.agilworks"
@@ -23,6 +24,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -38,6 +40,29 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+tasks.jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = "0.80".toBigDecimal()
+			}
+		}
+	}
 }
 
 detekt {
